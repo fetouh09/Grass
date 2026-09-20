@@ -17,6 +17,84 @@
   .alert{padding:12px;border-radius:12px;background:#fff8e9;border:1px solid #f0d99b;color:#7e5a0e;font-size:13px;margin-top:12px}.ok{background:#eaf7ee;border-color:#c7e7d1;color:#235f38}.footer-note{font-size:11px;color:#7c8880;margin-top:18px}
   @media(max-width:1000px){.sidebar{width:190px}.main{margin-left:190px;width:calc(100% - 190px)}.grid{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.form-grid{grid-template-columns:repeat(2,1fr)}.result-grid{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:700px){.sidebar{position:static;width:100%;height:auto}.app{display:block}.main{margin:0;width:100%;padding:14px}.nav{display:grid;grid-template-columns:repeat(2,1fr)}.grid,.form-grid,.result-grid{grid-template-columns:1fr}.topbar{align-items:flex-start;gap:10px}.badge{display:none}}
+
+
+  /* Responsive enhancements */
+  html{min-width:320px;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{overflow-x:hidden}
+  img,svg{max-width:100%;height:auto}
+  .card{min-width:0}
+  .mobile-menu-btn{display:none;border:0;background:#10261b;color:#fff;width:44px;height:44px;border-radius:12px;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;font-size:22px;line-height:1}
+  .sidebar-overlay{display:none}
+  .table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px}
+  .table-wrap table{margin:0}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  input,select,button{font-family:inherit}
+
+  @media(max-width:1200px){
+    .main{padding:20px}
+    .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+
+  @media(max-width:900px){
+    .sidebar{width:220px}
+    .main{margin-left:220px;width:calc(100% - 220px);padding:18px}
+    .two{grid-template-columns:1fr}
+    .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .result-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .title h1{font-size:23px}
+  }
+
+  @media(max-width:767px){
+    .app{display:block;min-height:100dvh}
+    .sidebar{position:fixed;z-index:1001;width:min(82vw,300px);height:100dvh;left:0;top:0;bottom:auto;transform:translateX(-105%);transition:transform .24s ease;box-shadow:14px 0 38px rgba(0,0,0,.18);padding:18px}
+    .sidebar.open{transform:translateX(0)}
+    .sidebar-overlay{position:fixed;inset:0;background:rgba(8,24,15,.45);z-index:1000;display:block;opacity:0;pointer-events:none;transition:opacity .24s ease}
+    .sidebar-overlay.show{opacity:1;pointer-events:auto}
+    .nav{display:block}
+    .nav button{padding:13px 14px;font-size:14px;margin:4px 0}
+    .main{margin:0;width:100%;padding:14px 12px 24px}
+    .topbar{position:sticky;top:0;z-index:100;background:rgba(244,247,245,.96);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:8px 0 12px;margin-bottom:12px;gap:10px;align-items:center}
+    .mobile-menu-btn{display:inline-flex}
+    .topbar .title{min-width:0;flex:1}
+    .title h1{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .title p{font-size:12px;line-height:1.4;display:none}
+    .badge{display:none}
+    .grid,.form-grid,.result-grid{grid-template-columns:1fr}
+    .two{grid-template-columns:1fr;gap:12px}
+    .section{margin-top:12px}
+    .card{padding:14px;border-radius:14px}
+    .kpi .value{font-size:24px}
+    .section-head{align-items:flex-start;gap:10px;flex-wrap:wrap}
+    .section-head h2{font-size:17px}
+    .section-head .btn{width:auto}
+    .field input,.field select{font-size:16px;min-height:46px;padding:10px 11px}
+    .btn{min-height:44px;padding:11px 14px}
+    .actions{display:grid;grid-template-columns:1fr;gap:8px}
+    .actions .btn{width:100%}
+    .footer-note{line-height:1.5}
+
+    /* Tables become touch-friendly data cards */
+    .table-wrap{overflow:visible;border-radius:0}
+    .table-wrap table,.table-wrap thead,.table-wrap tbody,.table-wrap tr,.table-wrap th,.table-wrap td{display:block;width:100%}
+    .table-wrap thead{display:none}
+    .table-wrap tr{background:#fff;border:1px solid #e8ede9;border-radius:12px;padding:8px 10px;margin-bottom:10px;box-shadow:0 2px 8px rgba(20,40,28,.025)}
+    .table-wrap td{border:0;border-bottom:1px solid #eff2f0;padding:9px 0;display:grid;grid-template-columns:minmax(105px,42%) 1fr;gap:10px;align-items:center;text-align:right;word-break:break-word}
+    .table-wrap td:last-child{border-bottom:0}
+    .table-wrap td::before{content:attr(data-label);font-size:11px;line-height:1.3;color:#6b756f;font-weight:700;text-align:left}
+    .table-wrap td .status{justify-self:end}
+  }
+
+  @media(max-width:420px){
+    .main{padding-left:10px;padding-right:10px}
+    .card{padding:12px}
+    .title h1{font-size:18px}
+    .mobile-menu-btn{width:42px;height:42px}
+    .kpi .value{font-size:22px}
+    .result .rvalue{font-size:18px}
+    .table-wrap td{grid-template-columns:minmax(92px,40%) 1fr;font-size:12px}
+  }
+
 </style>
 </head>
 <body>
@@ -34,8 +112,10 @@
       <button data-screen="finished">Finished Goods</button>
     </div>
   </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
   <main class="main">
     <div class="topbar">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open navigation" aria-expanded="false">☰</button>
       <div class="title"><h1 id="pageTitle">Management Dashboard</h1><p>End-to-end factory monitoring from sales order to finished goods</p></div>
       <div class="badge">Demo Version • 20 Sep 2026</div>
     </div>
@@ -100,7 +180,7 @@
           <div class="field"><label>Available Backing Stock (kg)</label><input id="backStock" type="number" value="5000" /></div>
           <div class="field"><label>Available Coating Stock (kg)</label><input id="coatStock" type="number" value="22000" /></div>
         </div>
-        <div style="margin-top:14px"><button class="btn" onclick="calculateMaterials()">Calculate Order Requirements</button> <button class="btn secondary" onclick="loadExample()">Load Example</button></div>
+        <div class="actions"><button class="btn" onclick="calculateMaterials()">Calculate Order Requirements</button><button class="btn secondary" onclick="loadExample()">Load Example</button></div>
         <div class="result-grid">
           <div class="result"><div class="rlabel">Yarn Gross</div><div class="rvalue" id="yarnGross">8,652 kg</div></div>
           <div class="result"><div class="rlabel">Backing Gross</div><div class="rvalue" id="backGross">4,187 kg</div></div>
@@ -125,7 +205,7 @@
             <div class="field"><label>Produced Quantity (m²)</label><input value="4820" /></div>
             <div class="field"><label>Waste (m²)</label><input value="112" /></div>
             <div class="field"><label>Downtime (min)</label><input value="28" /></div>
-          </div><div style="margin-top:14px"><button class="btn">Save Shift Production</button></div>
+          </div><div class="actions"><button class="btn">Save Shift Production</button></div>
         </div>
         <div class="card"><div class="section-head"><h2>SO-26094</h2><span>Sports 50mm</span></div>
           <div class="kpi"><div class="label">Planned</div><div class="value">18,000 m²</div></div>
@@ -172,9 +252,40 @@
   </main>
 </div>
 <script>
+const sidebar=document.querySelector('.sidebar');
+const mobileMenuBtn=document.getElementById('mobileMenuBtn');
+const sidebarOverlay=document.getElementById('sidebarOverlay');
+function setSidebar(open){
+  sidebar.classList.toggle('open',open);
+  sidebarOverlay.classList.toggle('show',open);
+  mobileMenuBtn.setAttribute('aria-expanded',String(open));
+  document.body.style.overflow=(open && window.innerWidth<=767)?'hidden':'';
+}
+mobileMenuBtn.addEventListener('click',()=>setSidebar(!sidebar.classList.contains('open')));
+sidebarOverlay.addEventListener('click',()=>setSidebar(false));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')setSidebar(false)});
+window.addEventListener('resize',()=>{if(window.innerWidth>767)setSidebar(false)});
+
+// Add responsive wrappers and mobile labels to all data tables.
+function applyTableLabels(table){
+  const headers=[...table.querySelectorAll('thead th')].map(th=>th.textContent.trim());
+  table.querySelectorAll('tbody tr').forEach(row=>{
+    [...row.children].forEach((cell,i)=>cell.setAttribute('data-label',headers[i]||''));
+  });
+}
+document.querySelectorAll('table').forEach(table=>{
+  if(!table.parentElement.classList.contains('table-wrap')){
+    const wrap=document.createElement('div');
+    wrap.className='table-wrap';
+    table.parentNode.insertBefore(wrap,table);
+    wrap.appendChild(table);
+  }
+  applyTableLabels(table);
+});
+
 const buttons=document.querySelectorAll('.nav button');
 const titles={dashboard:'Management Dashboard',orders:'Orders',calculator:'Material Calculator',production:'Daily Production',machines:'Machines',inventory:'Inventory',finished:'Finished Goods'};
-buttons.forEach(btn=>btn.addEventListener('click',()=>{buttons.forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(btn.dataset.screen).classList.add('active');document.getElementById('pageTitle').textContent=titles[btn.dataset.screen];}));
+buttons.forEach(btn=>btn.addEventListener('click',()=>{buttons.forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(btn.dataset.screen).classList.add('active');document.getElementById('pageTitle').textContent=titles[btn.dataset.screen];if(window.innerWidth<=767)setSidebar(false);window.scrollTo({top:0,behavior:'smooth'});}));
 function fmt(n){return Math.round(n).toLocaleString('en-US')+' kg'}
 function calculateMaterials(){
  const q=+qty.value||0, yr=+yarnRate.value||0, yw=+yarnWaste.value||0, br=+backRate.value||0, bw=+backWaste.value||0, cr=+coatRate.value||0, cw=+coatWaste.value||0;
@@ -184,6 +295,7 @@ function calculateMaterials(){
  yarnGross.textContent=fmt(yg);backGross.textContent=fmt(bg);coatGross.textContent=fmt(cg);totalGross.textContent=fmt(yg+bg+cg);
  const data=[['Yarn',ynet,yw,yg,ys],['Primary Backing',bnet,bw,bg,bs],['Coating Compound',cnet,cw,cg,cs]];
  calcTable.innerHTML=data.map(r=>{const sh=Math.max(0,r[3]-r[4]);return `<tr><td>${r[0]}</td><td>${q.toLocaleString()} × ${(r[1]/q||0).toFixed(3)}</td><td>${r[2]}%</td><td>${fmt(r[3])}</td><td>${fmt(r[4])}</td><td>${sh?'<span class="status red">'+fmt(sh)+'</span>':'<span class="status green">No Shortage</span>'}</td></tr>`}).join('');
+ applyTableLabels(calcTable.closest('table'));
  const shorts=data.map(r=>[r[0],Math.max(0,r[3]-r[4])]).filter(x=>x[1]>0);
  shortageAlert.className=shorts.length?'alert':'alert ok';
  shortageAlert.innerHTML=shorts.length?'Expected shortage: '+shorts.map(x=>`<b>${x[0]} ${fmt(x[1])}</b>`).join(' • '):'All required materials are available in stock for this order.';
