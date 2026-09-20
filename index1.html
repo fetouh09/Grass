@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TurfFlow Demo</title>
+<style>
+  *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#f4f7f5;color:#17201b}
+  .app{display:flex;min-height:100vh}.sidebar{width:250px;background:#10261b;color:#fff;padding:20px;position:fixed;left:0;top:0;bottom:0;overflow:auto}
+  .brand{font-size:25px;font-weight:700;margin-bottom:4px}.sub{font-size:12px;opacity:.7;margin-bottom:24px}.nav button{width:100%;text-align:left;border:0;background:transparent;color:#dce8e0;padding:12px 14px;border-radius:10px;margin:4px 0;cursor:pointer;font-size:14px}.nav button.active,.nav button:hover{background:#1e5a3b;color:#fff}
+  .main{margin-left:250px;width:calc(100% - 250px);padding:24px}.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.title h1{margin:0;font-size:26px}.title p{margin:5px 0 0;color:#6c786f;font-size:13px}.badge{background:#e7f4ea;color:#21683d;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:700}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card{background:#fff;border:1px solid #e5ebe7;border-radius:16px;padding:16px;box-shadow:0 4px 18px rgba(20,40,28,.04)}.kpi .label{color:#6b756f;font-size:13px}.kpi .value{font-size:27px;font-weight:700;margin-top:9px}.kpi .hint{font-size:12px;margin-top:8px;color:#2c7b49}
+  .section{margin-top:18px}.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.section-head h2{font-size:18px;margin:0}.section-head span{font-size:12px;color:#738078}
+  table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:12px 10px;border-bottom:1px solid #edf1ee;text-align:left}th{color:#637069;font-weight:700;background:#fbfcfb}.status{display:inline-block;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:700}.green{background:#e6f5eb;color:#1e6b3c}.amber{background:#fff1d6;color:#9a6510}.red{background:#fde5e5;color:#a52b2b}.blue{background:#e4efff;color:#285f9e}
+  .two{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}.progress{height:8px;background:#edf2ee;border-radius:10px;overflow:hidden}.progress>span{display:block;height:100%;background:#2b7d4b;border-radius:10px}.machine{padding:12px 0;border-bottom:1px solid #edf1ee}.machine:last-child{border-bottom:0}.machine-top{display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px}
+  .screen{display:none}.screen.active{display:block}.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.field label{display:block;font-size:12px;color:#657069;margin-bottom:6px}.field input,.field select{width:100%;padding:11px;border:1px solid #dfe6e1;border-radius:10px;background:#fff;font-size:13px}.btn{border:0;background:#1f6c40;color:#fff;padding:11px 16px;border-radius:10px;font-weight:700;cursor:pointer}.btn.secondary{background:#eef3ef;color:#25472f}.result-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.result{padding:14px;border-radius:12px;background:#f7faf8;border:1px solid #e5ece7}.result .rlabel{font-size:11px;color:#6f7a72}.result .rvalue{font-size:20px;font-weight:700;margin-top:6px}
+  .alert{padding:12px;border-radius:12px;background:#fff8e9;border:1px solid #f0d99b;color:#7e5a0e;font-size:13px;margin-top:12px}.ok{background:#eaf7ee;border-color:#c7e7d1;color:#235f38}.footer-note{font-size:11px;color:#7c8880;margin-top:18px}
+  @media(max-width:1000px){.sidebar{width:190px}.main{margin-left:190px;width:calc(100% - 190px)}.grid{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.form-grid{grid-template-columns:repeat(2,1fr)}.result-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:700px){.sidebar{position:static;width:100%;height:auto}.app{display:block}.main{margin:0;width:100%;padding:14px}.nav{display:grid;grid-template-columns:repeat(2,1fr)}.grid,.form-grid,.result-grid{grid-template-columns:1fr}.topbar{align-items:flex-start;gap:10px}.badge{display:none}}
+
+
+  /* Responsive enhancements */
+  html{min-width:320px;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{overflow-x:hidden}
+  img,svg{max-width:100%;height:auto}
+  .card{min-width:0}
+  .mobile-menu-btn{display:none;border:0;background:#10261b;color:#fff;width:44px;height:44px;border-radius:12px;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;font-size:22px;line-height:1}
+  .sidebar-overlay{display:none}
+  .table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px}
+  .table-wrap table{margin:0}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  input,select,button{font-family:inherit}
+
+  @media(max-width:1200px){
+    .main{padding:20px}
+    .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+
+  @media(max-width:900px){
+    .sidebar{width:220px}
+    .main{margin-left:220px;width:calc(100% - 220px);padding:18px}
+    .two{grid-template-columns:1fr}
+    .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .result-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .title h1{font-size:23px}
+  }
+
+  @media(max-width:767px){
+    .app{display:block;min-height:100dvh}
+    .sidebar{position:fixed;z-index:1001;width:min(82vw,300px);height:100dvh;left:0;top:0;bottom:auto;transform:translateX(-105%);transition:transform .24s ease;box-shadow:14px 0 38px rgba(0,0,0,.18);padding:18px}
+    .sidebar.open{transform:translateX(0)}
+    .sidebar-overlay{position:fixed;inset:0;background:rgba(8,24,15,.45);z-index:1000;display:block;opacity:0;pointer-events:none;transition:opacity .24s ease}
+    .sidebar-overlay.show{opacity:1;pointer-events:auto}
+    .nav{display:block}
+    .nav button{padding:13px 14px;font-size:14px;margin:4px 0}
+    .main{margin:0;width:100%;padding:14px 12px 24px}
+    .topbar{position:sticky;top:0;z-index:100;background:rgba(244,247,245,.96);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:8px 0 12px;margin-bottom:12px;gap:10px;align-items:center}
+    .mobile-menu-btn{display:inline-flex}
+    .topbar .title{min-width:0;flex:1}
+    .title h1{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .title p{font-size:12px;line-height:1.4;display:none}
+    .badge{display:none}
+    .grid,.form-grid,.result-grid{grid-template-columns:1fr}
+    .two{grid-template-columns:1fr;gap:12px}
+    .section{margin-top:12px}
+    .card{padding:14px;border-radius:14px}
+    .kpi .value{font-size:24px}
+    .section-head{align-items:flex-start;gap:10px;flex-wrap:wrap}
+    .section-head h2{font-size:17px}
+    .section-head .btn{width:auto}
+    .field input,.field select{font-size:16px;min-height:46px;padding:10px 11px}
+    .btn{min-height:44px;padding:11px 14px}
+    .actions{display:grid;grid-template-columns:1fr;gap:8px}
+    .actions .btn{width:100%}
+    .footer-note{line-height:1.5}
+
+    /* Tables become touch-friendly data cards */
+    .table-wrap{overflow:visible;border-radius:0}
+    .table-wrap table,.table-wrap thead,.table-wrap tbody,.table-wrap tr,.table-wrap th,.table-wrap td{display:block;width:100%}
+    .table-wrap thead{display:none}
+    .table-wrap tr{background:#fff;border:1px solid #e8ede9;border-radius:12px;padding:8px 10px;margin-bottom:10px;box-shadow:0 2px 8px rgba(20,40,28,.025)}
+    .table-wrap td{border:0;border-bottom:1px solid #eff2f0;padding:9px 0;display:grid;grid-template-columns:minmax(105px,42%) 1fr;gap:10px;align-items:center;text-align:right;word-break:break-word}
+    .table-wrap td:last-child{border-bottom:0}
+    .table-wrap td::before{content:attr(data-label);font-size:11px;line-height:1.3;color:#6b756f;font-weight:700;text-align:left}
+    .table-wrap td .status{justify-self:end}
+  }
+
+  @media(max-width:420px){
+    .main{padding-left:10px;padding-right:10px}
+    .card{padding:12px}
+    .title h1{font-size:18px}
+    .mobile-menu-btn{width:42px;height:42px}
+    .kpi .value{font-size:22px}
+    .result .rvalue{font-size:18px}
+    .table-wrap td{grid-template-columns:minmax(92px,40%) 1fr;font-size:12px}
+  }
+
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">TurfFlow</div>
+    <div class="sub">Artificial Grass Manufacturing System</div>
+    <div class="nav">
+      <button class="active" data-screen="dashboard">Management Dashboard</button>
+      <button data-screen="orders">Orders</button>
+      <button data-screen="calculator">Material Calculator</button>
+      <button data-screen="production">Daily Production</button>
+      <button data-screen="machines">Machines</button>
+      <button data-screen="inventory">Inventory</button>
+      <button data-screen="finished">Finished Goods</button>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+  <main class="main">
+    <div class="topbar">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open navigation" aria-expanded="false">☰</button>
+      <div class="title"><h1 id="pageTitle">Management Dashboard</h1><p>End-to-end factory monitoring from sales order to finished goods</p></div>
+      <div class="badge">Demo Version • 20 Sep 2026</div>
+    </div>
+
+    <section id="dashboard" class="screen active">
+      <div class="grid">
+        <div class="card kpi"><div class="label">Today's Production</div><div class="value">18,420 m²</div><div class="hint">↑ 7.8% vs. yesterday</div></div>
+        <div class="card kpi"><div class="label">Orders in Production</div><div class="value">7</div><div class="hint">3 Tufting • 4 Coating</div></div>
+        <div class="card kpi"><div class="label">Average Waste</div><div class="value">2.63%</div><div class="hint">Better than 3.00% target</div></div>
+        <div class="card kpi"><div class="label">Finished Goods</div><div class="value">42,680 m²</div><div class="hint">Estimated value 3.84M</div></div>
+      </div>
+      <div class="two section">
+        <div class="card">
+          <div class="section-head"><h2>Active Orders</h2><span>Last updated: now</span></div>
+          <table><thead><tr><th>Order</th><th>Product</th><th>Qty</th><th>Produced</th><th>Remaining</th><th>Status</th></tr></thead><tbody>
+          <tr><td>SO-26091</td><td>Landscape 40mm</td><td>25,000</td><td>17,600</td><td>7,400</td><td><span class="status green">Coating</span></td></tr>
+          <tr><td>SO-26094</td><td>Sports 50mm</td><td>18,000</td><td>8,200</td><td>9,800</td><td><span class="status blue">Tufting</span></td></tr>
+          <tr><td>SO-26097</td><td>Landscape 30mm</td><td>12,500</td><td>0</td><td>12,500</td><td><span class="status amber">Material Hold</span></td></tr>
+          <tr><td>SO-26100</td><td>Decor 20mm</td><td>8,000</td><td>8,000</td><td>0</td><td><span class="status green">Packing</span></td></tr>
+          </tbody></table>
+        </div>
+        <div class="card">
+          <div class="section-head"><h2>Machine Status</h2><span>Live</span></div>
+          <div class="machine"><div class="machine-top"><b>TFT-01</b><span>SO-26094 • 82%</span></div><div class="progress"><span style="width:82%"></span></div></div>
+          <div class="machine"><div class="machine-top"><b>TFT-02</b><span>SO-26091 • 68%</span></div><div class="progress"><span style="width:68%"></span></div></div>
+          <div class="machine"><div class="machine-top"><b>COAT-01</b><span>SO-26091 • 70%</span></div><div class="progress"><span style="width:70%"></span></div></div>
+          <div class="machine"><div class="machine-top"><b>COAT-02</b><span>Changeover • 24 min</span></div><div class="progress"><span style="width:35%"></span></div></div>
+        </div>
+      </div>
+      <div class="grid section">
+        <div class="card kpi"><div class="label">Tufting Efficiency</div><div class="value">91.4%</div><div class="hint">Target 90%</div></div>
+        <div class="card kpi"><div class="label">Coating Efficiency</div><div class="value">87.9%</div><div class="hint">Downtime 46 min</div></div>
+        <div class="card kpi"><div class="label">Orders at Risk</div><div class="value">2</div><div class="hint" style="color:#a52b2b">Planning action required</div></div>
+        <div class="card kpi"><div class="label">Materials Below Safety Stock</div><div class="value">4</div><div class="hint" style="color:#a52b2b">Yarn Green 8800D is most critical</div></div>
+      </div>
+    </section>
+
+    <section id="orders" class="screen">
+      <div class="card">
+        <div class="section-head"><h2>Order Management</h2><button class="btn">+ New Order</button></div>
+        <table><thead><tr><th>Order</th><th>Customer</th><th>Specification</th><th>Qty m²</th><th>Due</th><th>Completion</th><th>Stock Match</th><th>Status</th></tr></thead><tbody>
+          <tr><td>SO-26091</td><td>GreenScape</td><td>40mm / 3⁄8 / 16800D</td><td>25,000</td><td>24/09</td><td>70.4%</td><td>0</td><td><span class="status green">Running</span></td></tr>
+          <tr><td>SO-26094</td><td>ProField</td><td>50mm / 5⁄8 / 12000D</td><td>18,000</td><td>26/09</td><td>45.6%</td><td>2,400</td><td><span class="status blue">Tufting</span></td></tr>
+          <tr><td>SO-26097</td><td>Urban Turf</td><td>30mm / 3⁄8 / 11000D</td><td>12,500</td><td>28/09</td><td>0%</td><td>5,000</td><td><span class="status amber">Material Hold</span></td></tr>
+        </tbody></table>
+      </div>
+    </section>
+
+    <section id="calculator" class="screen">
+      <div class="card">
+        <div class="section-head"><h2>Order Material Calculator</h2><span>Values can be configured for each Product Recipe</span></div>
+        <div class="form-grid">
+          <div class="field"><label>Order Code</label><input id="orderCode" value="SO-26105" /></div>
+          <div class="field"><label>Required Quantity (m²)</label><input id="qty" type="number" value="25000" /></div>
+          <div class="field"><label>Yarn Standard (kg/m²)</label><input id="yarnRate" type="number" step="0.001" value="0.336" /></div>
+          <div class="field"><label>Yarn Waste %</label><input id="yarnWaste" type="number" step="0.1" value="3" /></div>
+          <div class="field"><label>Primary Backing (kg/m²)</label><input id="backRate" type="number" step="0.001" value="0.165" /></div>
+          <div class="field"><label>Backing Waste %</label><input id="backWaste" type="number" step="0.1" value="1.5" /></div>
+          <div class="field"><label>Coating Compound (kg/m²)</label><input id="coatRate" type="number" step="0.001" value="0.700" /></div>
+          <div class="field"><label>Coating Waste %</label><input id="coatWaste" type="number" step="0.1" value="2" /></div>
+          <div class="field"><label>Available Yarn Stock (kg)</label><input id="yarnStock" type="number" value="6500" /></div>
+          <div class="field"><label>Available Backing Stock (kg)</label><input id="backStock" type="number" value="5000" /></div>
+          <div class="field"><label>Available Coating Stock (kg)</label><input id="coatStock" type="number" value="22000" /></div>
+        </div>
+        <div class="actions"><button class="btn" onclick="calculateMaterials()">Calculate Order Requirements</button><button class="btn secondary" onclick="loadExample()">Load Example</button></div>
+        <div class="result-grid">
+          <div class="result"><div class="rlabel">Yarn Gross</div><div class="rvalue" id="yarnGross">8,652 kg</div></div>
+          <div class="result"><div class="rlabel">Backing Gross</div><div class="rvalue" id="backGross">4,187 kg</div></div>
+          <div class="result"><div class="rlabel">Coating Gross</div><div class="rvalue" id="coatGross">17,850 kg</div></div>
+          <div class="result"><div class="rlabel">Total Materials</div><div class="rvalue" id="totalGross">30,689 kg</div></div>
+        </div>
+        <div id="shortageAlert" class="alert">Expected Yarn shortage: <b>2,152 kg</b>. All other materials are available.</div>
+      </div>
+      <div class="card section">
+        <div class="section-head"><h2>Calculation Logic</h2><span>Configurable Formula Engine</span></div>
+        <table><thead><tr><th>Material</th><th>Net Formula</th><th>Waste</th><th>Gross Requirement</th><th>Stock</th><th>Shortage</th></tr></thead><tbody id="calcTable"></tbody></table>
+      </div>
+    </section>
+
+    <section id="production" class="screen">
+      <div class="two">
+        <div class="card"><div class="section-head"><h2>Record Today's Production</h2><span>Shift A</span></div>
+          <div class="form-grid" style="grid-template-columns:repeat(2,1fr)">
+            <div class="field"><label>Stage</label><select><option>Tufting</option><option>Coating</option><option>Finishing</option></select></div>
+            <div class="field"><label>Machine</label><select><option>TFT-01</option><option>TFT-02</option><option>COAT-01</option></select></div>
+            <div class="field"><label>Order</label><select><option>SO-26094</option><option>SO-26091</option></select></div>
+            <div class="field"><label>Produced Quantity (m²)</label><input value="4820" /></div>
+            <div class="field"><label>Waste (m²)</label><input value="112" /></div>
+            <div class="field"><label>Downtime (min)</label><input value="28" /></div>
+          </div><div class="actions"><button class="btn">Save Shift Production</button></div>
+        </div>
+        <div class="card"><div class="section-head"><h2>SO-26094</h2><span>Sports 50mm</span></div>
+          <div class="kpi"><div class="label">Planned</div><div class="value">18,000 m²</div></div>
+          <div class="machine"><div class="machine-top"><b>Produced</b><span>8,200 m²</span></div><div class="progress"><span style="width:45.6%"></span></div></div>
+          <div class="grid" style="grid-template-columns:repeat(2,1fr);margin-top:10px"><div class="result"><div class="rlabel">Remaining</div><div class="rvalue">9,800</div></div><div class="result"><div class="rlabel">ETA</div><div class="rvalue">2.1 days</div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="machines" class="screen">
+      <div class="card"><div class="section-head"><h2>Machine Performance by Product</h2><span>Actual historical rates</span></div>
+        <table><thead><tr><th>Machine</th><th>Stage</th><th>Product</th><th>Avg m²/hr</th><th>Waste %</th><th>Efficiency</th><th>Downtime</th></tr></thead><tbody>
+          <tr><td>TFT-01</td><td>Tufting</td><td>40mm Landscape</td><td>612</td><td>2.1%</td><td>93%</td><td>4.2%</td></tr>
+          <tr><td>TFT-01</td><td>Tufting</td><td>50mm Sports</td><td>486</td><td>2.9%</td><td>88%</td><td>6.1%</td></tr>
+          <tr><td>TFT-02</td><td>Tufting</td><td>40mm Landscape</td><td>575</td><td>3.4%</td><td>86%</td><td>8.4%</td></tr>
+          <tr><td>COAT-01</td><td>Coating</td><td>All 3.7m rolls</td><td>720</td><td>1.7%</td><td>91%</td><td>5.3%</td></tr>
+        </tbody></table>
+      </div>
+    </section>
+
+    <section id="inventory" class="screen">
+      <div class="card"><div class="section-head"><h2>Raw Material Inventory</h2><span>Available / Reserved / Reorder</span></div>
+        <table><thead><tr><th>Material</th><th>Lot</th><th>On Hand</th><th>Reserved</th><th>Available</th><th>Min Stock</th><th>Status</th></tr></thead><tbody>
+          <tr><td>Yarn Green PE 8800D</td><td>YG-0926-11</td><td>8,900 kg</td><td>6,450</td><td>2,450</td><td>3,500</td><td><span class="status red">Reorder</span></td></tr>
+          <tr><td>Yarn Olive PE 8800D</td><td>YO-0926-06</td><td>5,400 kg</td><td>1,800</td><td>3,600</td><td>2,000</td><td><span class="status green">OK</span></td></tr>
+          <tr><td>Primary Backing PP</td><td>PB-0926-04</td><td>12,200 kg</td><td>4,100</td><td>8,100</td><td>4,000</td><td><span class="status green">OK</span></td></tr>
+          <tr><td>SBR Latex Compound</td><td>LC-0926-09</td><td>19,600 kg</td><td>15,700</td><td>3,900</td><td>5,000</td><td><span class="status red">Reorder</span></td></tr>
+        </tbody></table>
+      </div>
+    </section>
+
+    <section id="finished" class="screen">
+      <div class="card"><div class="section-head"><h2>Finished Goods Inventory</h2><span>Ready-to-sell stock</span></div>
+        <table><thead><tr><th>SKU</th><th>Specification</th><th>Rolls</th><th>Area</th><th>Reserved</th><th>Available</th><th>Latest Batch</th></tr></thead><tbody>
+          <tr><td>GR40-16800-A</td><td>40mm / 3⁄8 / 16800D</td><td>44</td><td>7,920 m²</td><td>2,100</td><td>5,820</td><td>B260918</td></tr>
+          <tr><td>GR30-11000-B</td><td>30mm / 3⁄8 / 11000D</td><td>31</td><td>5,580 m²</td><td>580</td><td>5,000</td><td>B260917</td></tr>
+          <tr><td>SP50-12000-C</td><td>50mm / 5⁄8 / 12000D</td><td>18</td><td>3,240 m²</td><td>840</td><td>2,400</td><td>B260916</td></tr>
+        </tbody></table>
+        <div class="alert ok">Example: if a new order for 7,000 m² of GR30-11000-B is received, the system will allocate 5,000 m² from finished stock and plan production for only the remaining 2,000 m².</div>
+      </div>
+    </section>
+
+    <div class="footer-note">This is an initial demonstration version. The production system will be a multi-user web application with a centralized database, role-based permissions, audit logs, barcode/QR tracking, and lot management.</div>
+  </main>
+</div>
+<script>
+const sidebar=document.querySelector('.sidebar');
+const mobileMenuBtn=document.getElementById('mobileMenuBtn');
+const sidebarOverlay=document.getElementById('sidebarOverlay');
+function setSidebar(open){
+  sidebar.classList.toggle('open',open);
+  sidebarOverlay.classList.toggle('show',open);
+  mobileMenuBtn.setAttribute('aria-expanded',String(open));
+  document.body.style.overflow=(open && window.innerWidth<=767)?'hidden':'';
+}
+mobileMenuBtn.addEventListener('click',()=>setSidebar(!sidebar.classList.contains('open')));
+sidebarOverlay.addEventListener('click',()=>setSidebar(false));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')setSidebar(false)});
+window.addEventListener('resize',()=>{if(window.innerWidth>767)setSidebar(false)});
+
+// Add responsive wrappers and mobile labels to all data tables.
+function applyTableLabels(table){
+  const headers=[...table.querySelectorAll('thead th')].map(th=>th.textContent.trim());
+  table.querySelectorAll('tbody tr').forEach(row=>{
+    [...row.children].forEach((cell,i)=>cell.setAttribute('data-label',headers[i]||''));
+  });
+}
+document.querySelectorAll('table').forEach(table=>{
+  if(!table.parentElement.classList.contains('table-wrap')){
+    const wrap=document.createElement('div');
+    wrap.className='table-wrap';
+    table.parentNode.insertBefore(wrap,table);
+    wrap.appendChild(table);
+  }
+  applyTableLabels(table);
+});
+
+const buttons=document.querySelectorAll('.nav button');
+const titles={dashboard:'Management Dashboard',orders:'Orders',calculator:'Material Calculator',production:'Daily Production',machines:'Machines',inventory:'Inventory',finished:'Finished Goods'};
+buttons.forEach(btn=>btn.addEventListener('click',()=>{buttons.forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(btn.dataset.screen).classList.add('active');document.getElementById('pageTitle').textContent=titles[btn.dataset.screen];if(window.innerWidth<=767)setSidebar(false);window.scrollTo({top:0,behavior:'smooth'});}));
+function fmt(n){return Math.round(n).toLocaleString('en-US')+' kg'}
+function calculateMaterials(){
+ const q=+qty.value||0, yr=+yarnRate.value||0, yw=+yarnWaste.value||0, br=+backRate.value||0, bw=+backWaste.value||0, cr=+coatRate.value||0, cw=+coatWaste.value||0;
+ const ys=+yarnStock.value||0, bs=+backStock.value||0, cs=+coatStock.value||0;
+ const ynet=q*yr, bnet=q*br, cnet=q*cr;
+ const yg=ynet*(1+yw/100), bg=bnet*(1+bw/100), cg=cnet*(1+cw/100);
+ yarnGross.textContent=fmt(yg);backGross.textContent=fmt(bg);coatGross.textContent=fmt(cg);totalGross.textContent=fmt(yg+bg+cg);
+ const data=[['Yarn',ynet,yw,yg,ys],['Primary Backing',bnet,bw,bg,bs],['Coating Compound',cnet,cw,cg,cs]];
+ calcTable.innerHTML=data.map(r=>{const sh=Math.max(0,r[3]-r[4]);return `<tr><td>${r[0]}</td><td>${q.toLocaleString()} × ${(r[1]/q||0).toFixed(3)}</td><td>${r[2]}%</td><td>${fmt(r[3])}</td><td>${fmt(r[4])}</td><td>${sh?'<span class="status red">'+fmt(sh)+'</span>':'<span class="status green">No Shortage</span>'}</td></tr>`}).join('');
+ applyTableLabels(calcTable.closest('table'));
+ const shorts=data.map(r=>[r[0],Math.max(0,r[3]-r[4])]).filter(x=>x[1]>0);
+ shortageAlert.className=shorts.length?'alert':'alert ok';
+ shortageAlert.innerHTML=shorts.length?'Expected shortage: '+shorts.map(x=>`<b>${x[0]} ${fmt(x[1])}</b>`).join(' • '):'All required materials are available in stock for this order.';
+}
+function loadExample(){qty.value=25000;yarnRate.value=.336;yarnWaste.value=3;backRate.value=.165;backWaste.value=1.5;coatRate.value=.700;coatWaste.value=2;yarnStock.value=6500;backStock.value=5000;coatStock.value=22000;calculateMaterials();}
+calculateMaterials();
+</script>
+</body>
+</html>
